@@ -1,5 +1,5 @@
 import os
-import requests
+import requests,re 
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, render_template
 
@@ -30,6 +30,13 @@ def log_in():
 		values = dict(UserId=user, password=password, serviceName = "ProntoAuthentication")
 		url = "http://phc.prontonetworks.com/cgi-bin/authlogin?URI=http://www.msftncsi.com/redirect"
 		sai = requests.session()
-		ans = sai.post(url, values)	
-	return render_template("login.html", ans=ans)	
+		p = sai.post(url, values)	
+	return check(p)
+
+@app.route("/log_in")
+def check(p):	
+	if re.findall("Successful", str(p.content)) != None:
+		return render_template("login.html", ans=p)	
+	else:
+		return render_template("index.html")
 
